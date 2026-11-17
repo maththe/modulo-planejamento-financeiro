@@ -1,0 +1,13 @@
+title = "Configuracao Gitleaks - Modulo Planejamento Financeiro"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Arquivos de exemplo, seeds ficticios para ambiente de demonstracao e testes automatizados"
+paths = [
+  '''^\.env\.example$''',
+  '''^backend/src/main/resources/db/migration/V2__seed_data\.sql$''',
+  '''^backend/src/test/''',
+  '''^frontend/src/services/demoData\.ts$'''
+]

@@ -1,0 +1,36 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  application:
+    name: modulo-planejamento-financeiro
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/planejamento_financeiro}
+    username: ${SPRING_DATASOURCE_USERNAME:agro_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:agro_pass_local}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=500,expireAfterWrite=10m
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:chave-local-desenvolvimento-planejamento-financeiro-2026-minimo-32b}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html

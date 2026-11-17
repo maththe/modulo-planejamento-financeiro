@@ -1,0 +1,10 @@
+{
+  "name": "Planejamento Financeiro da Horta",
+  "short_name": "Horta Finanças",
+  "description": "Módulo de Planejamento Financeiro para Agricultura Urbana e Periurbana",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#EFEAE3",
+  "theme_color": "#2C5745",
+  "lang": "pt-BR"
+}

@@ -1,0 +1,59 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: agro-financeiro-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-planejamento_financeiro}
+      POSTGRES_USER: ${POSTGRES_USER:-agro_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-agro_pass_local}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-agro_user} -d ${POSTGRES_DB:-planejamento_financeiro}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: agro-financeiro-backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-planejamento_financeiro}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-agro_user}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-agro_pass_local}
+      JWT_SECRET: ${JWT_SECRET:-chave-local-desenvolvimento-planejamento-financeiro-2026-minimo-32b}
+      JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-86400000}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-docker}
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/api/health > /dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api}
+        VITE_DEMO_MODE: ${VITE_DEMO_MODE:-false}
+    container_name: agro-financeiro-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+
+volumes:
+  postgres_data:

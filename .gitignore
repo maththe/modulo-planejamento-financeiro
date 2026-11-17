@@ -1,0 +1,28 @@
+# Ambiente e segredos
+.env
+.env.*
+!.env.example
+
+# Java / Maven
+target/
+!.mvn/wrapper/maven-wrapper.jar
+*.log
+*.jar
+*.war
+*.ear
+
+# Node / Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDEs e SO
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
