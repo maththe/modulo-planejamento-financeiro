@@ -79,14 +79,18 @@ class CalculadoraIndicadoresServiceTest {
         assertThat(dto.statusSemaforo()).isEqualTo(StatusSemaforo.VERDE);
 
         IndicadorCulturaDto indAlface = dto.indicadoresPorCultura().get(0);
-        // Alface: CV 500 + CF 500 = 1000 / 500 = 2.00
+        // Alface: CV 500 + CF 500 = 1000 / 500 = 2.00; Receita 2000, MC 1500 (75%), PE = 500 / 0.75 = 666.67
         assertThat(indAlface.custoTotal()).isEqualByComparingTo("1000.00");
         assertThat(indAlface.custoUnitario()).isEqualByComparingTo("2.00");
+        assertThat(indAlface.margemNulaOuNegativa()).isFalse();
+        assertThat(indAlface.pontoEquilibrio()).isEqualByComparingTo("666.67");
 
         IndicadorCulturaDto indTomate = dto.indicadoresPorCultura().get(1);
-        // Tomate: CV 400 + CF 500 = 900 / 150 = 6.00
+        // Tomate: CV 400 + CF 500 = 900 / 150 = 6.00; Receita 1000, MC 600 (60%), PE = 500 / 0.60 = 833.33
         assertThat(indTomate.custoTotal()).isEqualByComparingTo("900.00");
         assertThat(indTomate.custoUnitario()).isEqualByComparingTo("6.00");
+        assertThat(indTomate.margemNulaOuNegativa()).isFalse();
+        assertThat(indTomate.pontoEquilibrio()).isEqualByComparingTo("833.33");
     }
 
     @Test
@@ -153,6 +157,10 @@ class CalculadoraIndicadoresServiceTest {
         assertThat(dto.pontoEquilibrio()).isNull();
         assertThat(dto.avisoMargem()).contains("Margem de contribuição nula ou negativa");
         assertThat(dto.statusSemaforo()).isEqualTo(StatusSemaforo.VERMELHO);
+
+        IndicadorCulturaDto indAlface = dto.indicadoresPorCultura().get(0);
+        assertThat(indAlface.margemNulaOuNegativa()).isTrue();
+        assertThat(indAlface.pontoEquilibrio()).isNull();
     }
 
     @Test
@@ -177,6 +185,10 @@ class CalculadoraIndicadoresServiceTest {
         assertThat(dto.pontoEquilibrio()).isNull();
         assertThat(dto.avisoMargem()).isNotBlank();
         assertThat(dto.statusSemaforo()).isEqualTo(StatusSemaforo.VERMELHO);
+
+        IndicadorCulturaDto indTomate = dto.indicadoresPorCultura().get(1);
+        assertThat(indTomate.margemNulaOuNegativa()).isTrue();
+        assertThat(indTomate.pontoEquilibrio()).isNull();
     }
 
     private Lancamento criarEntrada(Cultura cultura, String valor, String quantidade) {

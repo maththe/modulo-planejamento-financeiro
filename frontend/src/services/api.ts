@@ -78,7 +78,9 @@ export function obterSessaoSalva(): { token: string; usuario: UsuarioResumo } | 
   const rawUser = localStorage.getItem(AUTH_USER_KEY);
   if (!token || !rawUser) return null;
   try {
-    return { token, usuario: JSON.parse(rawUser) as UsuarioResumo };
+    const usuario = JSON.parse(rawUser) as UsuarioResumo;
+    usuario.nome = usuario.nome.replace(/\s*\((Gestor|Produtor)\)\s*$/i, '');
+    return { token, usuario };
   } catch {
     return null;
   }

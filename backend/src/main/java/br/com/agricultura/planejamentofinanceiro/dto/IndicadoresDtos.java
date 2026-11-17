@@ -22,6 +22,8 @@ public final class IndicadoresDtos {
             BigDecimal custoTotal,
             BigDecimal custoUnitario,
             BigDecimal margemContribuicao,
+            BigDecimal pontoEquilibrio,
+            boolean margemNulaOuNegativa,
             BigDecimal resultado
     ) {
     }

@@ -229,6 +229,18 @@ public class CalculadoraIndicadoresService {
                     ? ct.divide(qtdProd, 2, RoundingMode.HALF_UP)
                     : null;
 
+            boolean culturaMargemInvalida = rec.compareTo(BigDecimal.ZERO) <= 0
+                    || mc.compareTo(BigDecimal.ZERO) <= 0;
+            BigDecimal peCultura = null;
+            if (!culturaMargemInvalida) {
+                if (cf.compareTo(BigDecimal.ZERO) == 0) {
+                    peCultura = escala2(BigDecimal.ZERO);
+                } else {
+                    BigDecimal indMc = mc.divide(rec, 8, RoundingMode.HALF_UP);
+                    peCultura = cf.divide(indMc, 2, RoundingMode.HALF_UP);
+                }
+            }
+
             porCultura.add(new IndicadorCulturaDto(
                     ac.cultura.getId(),
                     ac.cultura.getNome(),
@@ -240,6 +252,8 @@ public class CalculadoraIndicadoresService {
                     ct,
                     custoUnitario,
                     mc,
+                    peCultura,
+                    culturaMargemInvalida,
                     res
             ));
         }

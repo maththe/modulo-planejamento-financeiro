@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   BookOpen,
   Calculator,
@@ -50,6 +50,7 @@ export const App: React.FC = () => {
   const [qtdPendentes, setQtdPendentes] = useState<number>(0);
   const [conflitos, setConflitos] = useState<ConflitoSync[]>([]);
   const [refreshTick, setRefreshTick] = useState<number>(0);
+  const sincronizandoRef = useRef<boolean>(false);
 
   const mesesDisponiveis = useMemo(() => {
     const hoje = new Date();
@@ -82,31 +83,45 @@ export const App: React.FC = () => {
     }
   }, [produtorAtivoId]);
 
-  const executarSincronizacao = useCallback(async () => {
-    if (!produtorAtivoId || somenteLeitura || modoOfflineSimulado || !navigator.onLine) return;
-    const fila = await listarFilaOffline(produtorAtivoId);
-    if (fila.length === 0) return;
-
-    setEstadoSync('SINCRONIZANDO');
-    try {
-      const res = await sincronizarFila(produtorAtivoId, culturas);
-      const listaConflitos = await listarConflitos(produtorAtivoId);
-      setConflitos(listaConflitos);
-      const restante = await listarFilaOffline(produtorAtivoId);
-      setQtdPendentes(restante.length);
-
-      if (res.conflitos > 0) {
-        setEstadoSync('CONFLITO');
-      } else if (restante.length > 0) {
-        setEstadoSync('PENDENTE');
-      } else {
-        setEstadoSync('SINCRONIZADO');
+  const executarSincronizacao = useCallback(
+    async (ignorarSimulacaoOffline = false) => {
+      if (
+        sincronizandoRef.current ||
+        !produtorAtivoId ||
+        somenteLeitura ||
+        (!ignorarSimulacaoOffline && modoOfflineSimulado) ||
+        !navigator.onLine
+      ) {
+        return;
       }
-      setRefreshTick((t) => t + 1);
-    } catch {
-      await atualizarEstadoFila();
-    }
-  }, [produtorAtivoId, somenteLeitura, modoOfflineSimulado, culturas, atualizarEstadoFila]);
+      sincronizandoRef.current = true;
+      try {
+        const fila = await listarFilaOffline(produtorAtivoId);
+        if (fila.length === 0) return;
+
+        setEstadoSync('SINCRONIZANDO');
+        const res = await sincronizarFila(produtorAtivoId, culturas);
+        const listaConflitos = await listarConflitos(produtorAtivoId);
+        setConflitos(listaConflitos);
+        const restante = await listarFilaOffline(produtorAtivoId);
+        setQtdPendentes(restante.length);
+
+        if (res.conflitos > 0) {
+          setEstadoSync('CONFLITO');
+        } else if (restante.length > 0) {
+          setEstadoSync('PENDENTE');
+        } else {
+          setEstadoSync('SINCRONIZADO');
+        }
+        setRefreshTick((t) => t + 1);
+      } catch {
+        await atualizarEstadoFila();
+      } finally {
+        sincronizandoRef.current = false;
+      }
+    },
+    [produtorAtivoId, somenteLeitura, modoOfflineSimulado, culturas, atualizarEstadoFila]
+  );
 
   useEffect(() => {
     if (!usuario) return;
@@ -139,7 +154,7 @@ export const App: React.FC = () => {
   useEffect(() => {
     const aoVoltarOnline = () => {
       setModoOfflineSimulado(false);
-      executarSincronizacao();
+      void executarSincronizacao(true);
     };
     const aoFicarOffline = () => {
       setModoOfflineSimulado(true);
@@ -153,13 +168,17 @@ export const App: React.FC = () => {
     };
   }, [executarSincronizacao]);
 
+  useEffect(() => {
+    if (!modoOfflineSimulado && navigator.onLine && produtorAtivoId && !somenteLeitura) {
+      void executarSincronizacao(true);
+    }
+  }, [modoOfflineSimulado, produtorAtivoId, somenteLeitura, executarSincronizacao]);
+
   const alternarModoOffline = () => {
     const proximo = !modoOfflineSimulado;
     setModoOfflineSimulado(proximo);
     if (!proximo && navigator.onLine) {
-      setTimeout(() => {
-        executarSincronizacao();
-      }, 150);
+      void executarSincronizacao(true);
     }
   };
 
@@ -178,7 +197,8 @@ export const App: React.FC = () => {
         <div style={{ minWidth: 0 }}>
           <h1 className="app-header-title">{usuario.hortaNome}</h1>
           <p className="app-header-sub">
-            {usuario.nome} ({usuario.perfil === 'GESTOR' ? 'Gestor' : 'Produtor'})
+            {usuario.nome.replace(/\s*\((Gestor|Produtor)\)\s*$/i, '')} (
+            {usuario.perfil === 'GESTOR' ? 'Gestor' : 'Produtor'})
           </p>
         </div>
         <div style={{ display: 'flex', gap: '6px' }}>
@@ -211,7 +231,7 @@ export const App: React.FC = () => {
         conflitos={conflitos}
         somenteLeitura={somenteLeitura}
         onAlternarOffline={alternarModoOffline}
-        onSincronizarAgora={executarSincronizacao}
+        onSincronizarAgora={() => void executarSincronizacao(true)}
       />
 
       <main className="main-content">

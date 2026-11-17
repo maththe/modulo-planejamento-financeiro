@@ -40,7 +40,7 @@ VALUES
 (
     '22222222-2222-2222-2222-222222222203',
     '11111111-1111-1111-1111-111111111101',
-    'Carlos Eduardo (Gestor)',
+    'Carlos Eduardo',
     'carlos.gestor',
     '$2a$10$WB3OgEOXtMDE6Xb0aAO30.olloSK06baOQpqVhNEIb447xET2Py3m',
     'GESTOR',

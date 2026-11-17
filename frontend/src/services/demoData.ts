@@ -31,7 +31,7 @@ export const DEMO_USUARIOS: UsuarioResumo[] = [
   },
   {
     id: '22222222-2222-2222-2222-222222222203',
-    nome: 'Carlos Eduardo (Gestor)',
+    nome: 'Carlos Eduardo',
     login: 'carlos.gestor',
     perfil: 'GESTOR',
     hortaId: HORTA_ID,

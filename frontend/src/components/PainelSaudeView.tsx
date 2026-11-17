@@ -214,6 +214,7 @@ export const PainelSaudeView: React.FC<PainelSaudeViewProps> = ({
                     <th>Custo Unitário</th>
                     <th>Receita</th>
                     <th>Margem de Contribuição</th>
+                    <th>Ponto de Equilíbrio (R$)</th>
                     <th>Resultado</th>
                   </tr>
                 </thead>
@@ -232,6 +233,11 @@ export const PainelSaudeView: React.FC<PainelSaudeViewProps> = ({
                       </td>
                       <td>{formatarMoeda(c.receita)}</td>
                       <td>{formatarMoeda(c.margemContribuicao)}</td>
+                      <td>
+                        {c.margemNulaOuNegativa
+                          ? 'N/A (Margem ≤ 0)'
+                          : formatarMoeda(c.pontoEquilibrio)}
+                      </td>
                       <td>{formatarMoeda(c.resultado)}</td>
                     </tr>
                   ))}

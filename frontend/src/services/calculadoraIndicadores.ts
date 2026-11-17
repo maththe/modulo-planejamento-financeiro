@@ -129,6 +129,13 @@ export function calcularIndicadoresLocal(
     const cf = round2(acc.cf);
     const custoTotal = round2(cv + cf);
     const receita = round2(acc.receita);
+    const margemContribuicaoCultura = round2(receita - cv);
+    const margemCulturaInvalida = receita <= 0 || margemContribuicaoCultura <= 0;
+    let pontoEquilibrioCultura: number | null = null;
+    if (!margemCulturaInvalida) {
+      pontoEquilibrioCultura =
+        cf === 0 ? 0 : round2(cf / (margemContribuicaoCultura / receita));
+    }
     return {
       culturaId: c.id,
       culturaNome: c.nome,
@@ -139,7 +146,9 @@ export function calcularIndicadoresLocal(
       custosFixosRateados: cf,
       custoTotal,
       custoUnitario: prod > 0 ? round2(custoTotal / prod) : null,
-      margemContribuicao: round2(receita - cv),
+      margemContribuicao: margemContribuicaoCultura,
+      pontoEquilibrio: pontoEquilibrioCultura,
+      margemNulaOuNegativa: margemCulturaInvalida,
       resultado: round2(receita - custoTotal),
     };
   });

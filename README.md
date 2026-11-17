@@ -89,7 +89,7 @@ flowchart LR
    cd modulo-planejamento-financeiro
    ```
 
-2. Copie o arquivo de variáveis de ambiente de exemplo (nunca versione `.env`):
+2. **Obrigatório:** crie o arquivo `.env` a partir do exemplo antes de subir os contêineres (o `docker-compose.yml` recusa subir sem `.env` para não expor credenciais padrão no repositório):
    ```bash
    cp .env.example .env
    ```
@@ -116,7 +116,7 @@ A migração `V2__seed_data.sql` cria a **Horta Comunitária Raízes do Bairro**
 | --- | --- | --- | --- | --- | --- |
 | `PRODUTOR` | Seu João da Silva | `joao.silva` | `123456` | Não | Próprios dados (leitura e escrita) |
 | `PRODUTOR` | Dona Maria dos Santos | `maria.santos` | `123456` | Não | Próprios dados (leitura e escrita) |
-| `GESTOR` | Carlos Eduardo (Gestor) | `carlos.gestor` | `123456` | **Sim (Obrigatório)** | Produtores da sua horta em **modo leitura** |
+| `GESTOR` | Carlos Eduardo | `carlos.gestor` | `123456` | **Sim (Obrigatório)** | Produtores da sua horta em **modo leitura** |
 
 > **Observação:** Na demonstração online publicada no GitHub Pages (`VITE_DEMO_MODE=true`), os dados são simulados no navegador e o login do gestor dispensa o código TOTP.
 

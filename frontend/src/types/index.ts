@@ -98,6 +98,8 @@ export interface IndicadorCultura {
   custoTotal: number;
   custoUnitario: number | null;
   margemContribuicao: number;
+  pontoEquilibrio: number | null;
+  margemNulaOuNegativa: boolean;
   resultado: number;
 }
 

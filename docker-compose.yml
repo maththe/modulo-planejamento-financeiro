@@ -4,15 +4,15 @@ services:
     container_name: agro-financeiro-db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-planejamento_financeiro}
-      POSTGRES_USER: ${POSTGRES_USER:-agro_user}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-agro_pass_local}
+      POSTGRES_DB: ${POSTGRES_DB:?Defina POSTGRES_DB no arquivo .env}
+      POSTGRES_USER: ${POSTGRES_USER:?Defina POSTGRES_USER no arquivo .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD no arquivo .env}
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-agro_user} -d ${POSTGRES_DB:-planejamento_financeiro}"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -27,10 +27,10 @@ services:
       db:
         condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-planejamento_financeiro}
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-agro_user}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-agro_pass_local}
-      JWT_SECRET: ${JWT_SECRET:-chave-local-desenvolvimento-planejamento-financeiro-2026-minimo-32b}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:?Defina POSTGRES_DB no arquivo .env}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:?Defina POSTGRES_USER no arquivo .env}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD no arquivo .env}
+      JWT_SECRET: ${JWT_SECRET:?Defina JWT_SECRET no arquivo .env}
       JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-86400000}
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-docker}
     ports:
